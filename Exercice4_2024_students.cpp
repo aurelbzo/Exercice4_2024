@@ -39,13 +39,13 @@ solve(const vector<T>& diag,
 }
 
 //@TODO code kappa
-double kappa(double r)
+double kappa(double r, double kappaR, double kappa0, double R)
 {
     return kappa0 + (kappaR - kappa0) * pow(r/R,2);
 }
 
 //@TODO code Source
-double Source(double r)
+double Source(double r, double S0, double r0, double sigma)
 {
     return S0 * exp(-pow(r-r0,2) / pow(sigma,2));
 }
@@ -86,12 +86,12 @@ main(int argc, char* argv[])
     // Position of elements @TODO code r[i]
     vector<double> r(pointCount);
     for (int i = 0; i < N + 1; ++i)
-        r[i] = 1.0;
+			r[i] = pow(i / N,1/alpha) * R; 
 
     // Distance between elements @TODO code h[i]
     vector<double> h(pointCount - 1);
     for (int i = 0; i < h.size(); ++i)
-        h[i] = 1.0;
+        h[i] = r[i+1] - r[i];
 
     // Construct the matrices
     vector<double> diagonal(pointCount, 0.0);  // Diagonal
@@ -102,17 +102,21 @@ main(int argc, char* argv[])
     for (int k = 0; k < N; ++k) { 
         // Matrix  and right-hand-side 
         // @TODO insert contributions from interval k 
+		double a(r[k]  + h[k]* 0.5);
+        upper[k]        += -1.0/pow(h[k],2)*kappa(a,kappaR,kappa0,R)*a;
+        lower[k]        += -1.0/pow(h[k],2)*kappa(a,kappaR,kappa0,R)*a;
+        diagonal[k]     += 1.0/pow(h[k],2)*kappa(a,kappaR,kappa0,R)*a ; 
+        diagonal[k + 1] += 1.0/pow(h[k],2)*kappa(a,kappaR,kappa0,R)*a ;
 
-        upper[k]        += 0.0;
-        lower[k]        += 0.0;
-        diagonal[k]     += 1.0; 
-        diagonal[k + 1] += 1.0;
-
-        rhs[k]     += 1.0; 
-        rhs[k + 1] += 1.0;
-    }
-
+        rhs[k]     += 0.5 * (Source(a,S0,r0,sigma)*a); 
+        rhs[k + 1] += 0.5 * (Source(a,S0,r0,sigma) *a);
+   
+}
     // Boundary conditions @TODO insert boundary conditions
+    diagonal[pointCount-2] = 1.0;
+    lower[pointCount-3] = 0.0;
+    rhs[pointCount-2] = TR;
+    
 
 
     // Solve the system of equations (do not change the following line!)

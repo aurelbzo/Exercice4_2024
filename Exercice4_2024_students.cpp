@@ -39,15 +39,15 @@ solve(const vector<T>& diag,
 }
 
 //@TODO code kappa
-double kappa()
+double kappa(double r)
 {
-    return 0.0;
+    return kappa0 + (kappaR - kappa0) * pow(r/R,2);
 }
 
 //@TODO code Source
-double Source()
+double Source(double r)
 {
-    return 0.0;
+    return S0 * exp(-pow(r-r0,2) / pow(sigma,2));
 }
 
 int

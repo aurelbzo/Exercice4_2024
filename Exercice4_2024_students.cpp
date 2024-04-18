@@ -103,13 +103,13 @@ main(int argc, char* argv[])
         // Matrix  and right-hand-side 
         // @TODO insert contributions from interval k 
 		double a(r[k]  + h[k]* 0.5);
-        upper[k]        += -1.0/pow(h[k],2)*kappa(a,kappaR,kappa0,R)*a;
-        lower[k]        += -1.0/pow(h[k],2)*kappa(a,kappaR,kappa0,R)*a;
-        diagonal[k]     += 1.0/pow(h[k],2)*kappa(a,kappaR,kappa0,R)*a ; 
-        diagonal[k + 1] += 1.0/pow(h[k],2)*kappa(a,kappaR,kappa0,R)*a ;
+        upper[k]        += -1.0/pow(h[k],1)*kappa(a,kappaR,kappa0,R)*a;
+        lower[k]        += -1.0/pow(h[k],1)*kappa(a,kappaR,kappa0,R)*a;
+        diagonal[k]     += 1.0/pow(h[k],1)*kappa(a,kappaR,kappa0,R)*a ; 
+        diagonal[k + 1] += 1.0/pow(h[k],1)*kappa(a,kappaR,kappa0,R)*a ;
 
-        rhs[k]     += 0.5 * (Source(a,S0,r0,sigma)*a); 
-        rhs[k + 1] += 0.5 * (Source(a,S0,r0,sigma) *a);
+        rhs[k]     += 0.5 *h[k]* (Source(a,S0,r0,sigma)*a); 
+        rhs[k + 1] += 0.5 *h[k]* (Source(a,S0,r0,sigma) *a);
    
 }
     // Boundary conditions @TODO insert boundary conditions

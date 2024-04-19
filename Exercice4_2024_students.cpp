@@ -67,7 +67,7 @@ main(int argc, char* argv[])
     // Set verbosity level. Set to 0 to reduce printouts in console.
     const int verbose   = configFile.get<int>("verbose");
     configFile.setVerbosity(verbose);
-	constexpr double pi =3.1415926535897932384626433832795028841971e0;
+	//constexpr double pi =3.1415926535897932384626433832795028841971e0;
     const double R      = configFile.get<double>("R");      // radius of cylinder
     const double S0     = configFile.get<double>("S0");     // source parameter
     const double r0     = configFile.get<double>("r0");     // source parameter
@@ -128,7 +128,7 @@ main(int argc, char* argv[])
         //@TODO compute heat flux at mid intervals, use finite element representation
         double Rmid(r[i]+h[i]/2);
         double Jq(-kappa(Rmid,kappaR,kappa0,R)*(temperature[i+1]/h[i]-temperature[i]/h[i]));
-        heatFlux[i]         = 2*pi*R*Jq;
+        heatFlux[i]  = Jq;
     }
 
     // Export data

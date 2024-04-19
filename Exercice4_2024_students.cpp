@@ -23,7 +23,7 @@ solve(const vector<T>& diag,
     vector<T> new_diag(diag);
     vector<T> new_rhs(rhs);
 
-    for (int i = 1; i < diag.size(); ++i) {
+    for (unsigned int i = 1; i < diag.size(); ++i) {
         double pivot = lower[i - 1] / new_diag[i - 1];
         new_diag[i] -= pivot * upper[i - 1];
         new_rhs[i] -= pivot * new_rhs[i - 1];
@@ -67,7 +67,7 @@ main(int argc, char* argv[])
     // Set verbosity level. Set to 0 to reduce printouts in console.
     const int verbose   = configFile.get<int>("verbose");
     configFile.setVerbosity(verbose);
-
+	constexpr double pi =3.1415926535897932384626433832795028841971e0;
     const double R      = configFile.get<double>("R");      // radius of cylinder
     const double S0     = configFile.get<double>("S0");     // source parameter
     const double r0     = configFile.get<double>("r0");     // source parameter
@@ -86,11 +86,11 @@ main(int argc, char* argv[])
     // Position of elements @TODO code r[i]
     vector<double> r(pointCount);
     for (int i = 0; i < N + 1; ++i)
-			r[i] = pow(i / N,1/alpha) * R; 
+			r[i] = pow(i / N,1.0/alpha) * R; 
 
     // Distance between elements @TODO code h[i]
     vector<double> h(pointCount - 1);
-    for (int i = 0; i < h.size(); ++i)
+    for (unsigned int i = 0; i < h.size(); ++i)
         h[i] = r[i+1] - r[i];
 
     // Construct the matrices
@@ -113,9 +113,9 @@ main(int argc, char* argv[])
    
 }
     // Boundary conditions @TODO insert boundary conditions
-    diagonal[pointCount-2] = 1.0;
-    lower[pointCount-3] = 0.0;
-    rhs[pointCount-2] = TR;
+    diagonal.back() = 1.0;
+    lower.back() = 0.0;
+    rhs.back() = TR;
     
 
 
@@ -124,9 +124,11 @@ main(int argc, char* argv[])
 
     // Calculate heat flux
     vector<double> heatFlux(temperature.size() - 1, 0);
-    for (int i = 0; i < heatFlux.size(); ++i) {
+    for (unsigned int i = 0; i < heatFlux.size(); ++i) {
         //@TODO compute heat flux at mid intervals, use finite element representation
-        heatFlux[i]         = 0.0;
+        double Rmid(r[i]+h[i]/2);
+        double Jq(-kappa(Rmid,kappaR,kappa0,R)*(temperature[i+1]/h[i]-temperature[i]/h[i]));
+        heatFlux[i]         = 2*pi*R*Jq;
     }
 
     // Export data
@@ -138,7 +140,7 @@ main(int argc, char* argv[])
         if (r.size() != temperature.size())
             throw std::runtime_error("error when writing temperature: r and "
                                      "temperature does not have size");
-        for (int i = 0; i < temperature.size(); ++i) {
+        for (unsigned int i = 0; i < temperature.size(); ++i) {
             ofs << r[i] << " " << temperature[i] << endl;
         }
     }
@@ -151,7 +153,7 @@ main(int argc, char* argv[])
         if (r.size() != (heatFlux.size() + 1))
             throw std::runtime_error("error when writing heatFlux: size of "
                                      "heatFlux should be 1 less than r");
-        for (int i = 0; i < heatFlux.size(); ++i) {
+        for (unsigned int i = 0; i < heatFlux.size(); ++i) {
             const double midPoint = 0.5 * (r[i + 1] + r[i]);
             ofs << midPoint << " " << heatFlux[i] << endl;
         }
